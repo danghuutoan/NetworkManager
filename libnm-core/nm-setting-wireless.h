@@ -57,6 +57,7 @@ G_BEGIN_DECLS
 #define NM_SETTING_WIRELESS_HIDDEN      "hidden"
 #define NM_SETTING_WIRELESS_POWERSAVE   "powersave"
 #define NM_SETTING_WIRELESS_MAC_ADDRESS_RANDOMIZATION   "mac-address-randomization"
+#define NM_SETTING_WIRELESS_PMF         "pmf"
 
 /**
  * NM_SETTING_WIRELESS_MODE_ADHOC:
@@ -98,6 +99,24 @@ typedef enum {
 	_NM_SETTING_WIRELESS_POWERSAVE_NUM, /*< skip >*/
 	NM_SETTING_WIRELESS_POWERSAVE_LAST          =  _NM_SETTING_WIRELESS_POWERSAVE_NUM - 1, /*< skip >*/
 } NMSettingWirelessPowersave;
+
+/**
+ * NMSettingWirelessPmf:
+ * @NM_SETTING_WIRELESS_PMF_DEFAULT: use the default value
+ * @NM_SETTING_WIRELESS_PMF_DISABLE: disable PMF
+ * @NM_SETTING_WIRELESS_PMF_OPTIONAL: enable PMF if the supplicant and the AP support it
+ * @NM_SETTING_WIRELESS_PMF_REQUIRED: require PMF and fail if not available
+ *
+ * These flags indicate whether PMF must be enabled.
+ **/
+typedef enum {
+	NM_SETTING_WIRELESS_PMF_DEFAULT       = 0,
+	NM_SETTING_WIRELESS_PMF_DISABLE       = 1,
+	NM_SETTING_WIRELESS_PMF_OPTIONAL      = 2,
+	NM_SETTING_WIRELESS_PMF_REQUIRED      = 3,
+	_NM_SETTING_WIRELESS_PMF_NUM, /*< skip >*/
+	NM_SETTING_WIRELESS_PMF_LAST          =  _NM_SETTING_WIRELESS_PMF_NUM - 1, /*< skip >*/
+} NMSettingWirelessPmf;
 
 /**
  * NMSettingWireless:
@@ -151,6 +170,9 @@ guint32           nm_setting_wireless_get_powersave          (NMSettingWireless 
 
 NM_AVAILABLE_IN_1_2
 NMSettingMacRandomization nm_setting_wireless_get_mac_address_randomization (NMSettingWireless *setting);
+
+NM_AVAILABLE_IN_1_10
+NMSettingWirelessPmf nm_setting_wireless_get_pmf (NMSettingWireless *setting);
 
 gboolean          nm_setting_wireless_add_seen_bssid         (NMSettingWireless *setting,
                                                               const char *bssid);
