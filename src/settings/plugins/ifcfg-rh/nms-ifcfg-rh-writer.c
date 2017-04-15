@@ -910,6 +910,16 @@ write_wireless_setting (NMConnection *connection,
 		break;
 	}
 
+	if (nm_setting_wireless_get_pmf (s_wireless) == NM_SETTING_WIRELESS_PMF_DEFAULT)
+		svUnsetValue (ifcfg, "PMF");
+	else {
+		gs_free char * value = NULL;
+
+		value = nm_utils_enum_to_str (nm_setting_wireless_pmf_get_type(),
+		                              nm_setting_wireless_get_pmf (s_wireless));
+		svSetValueStr (ifcfg, "PMF", value);
+	}
+
 	switch (nm_setting_wireless_get_mac_address_randomization (s_wireless)) {
 	case NM_SETTING_MAC_RANDOMIZATION_NEVER:
 		svSetValueStr (ifcfg, "MAC_ADDRESS_RANDOMIZATION", "never");

@@ -1653,6 +1653,14 @@ nm_setting_wireless_class_init (NMSettingWirelessClass *setting_wireless_class)
 	 *
 	 * Since: 1.10
 	 **/
+	/* ---ifcfg-rh---
+	 * property: pmf
+	 * variable: PMF(+)
+	 * values: default, disable, optional, required
+	 * description: Enables or disables PMF (802.11w)
+	 * example: PMF=required
+	 * ---end---
+	 */
 	g_object_class_install_property
 		(object_class, PROP_PMF,
 		 g_param_spec_uint (NM_SETTING_WIRELESS_PMF, "", "",

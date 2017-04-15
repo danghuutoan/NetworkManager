@@ -5736,6 +5736,7 @@ test_write_wifi_wpa_psk_adhoc (void)
 	              NM_SETTING_WIRELESS_MODE, "adhoc",
 	              NM_SETTING_WIRELESS_CHANNEL, 11,
 	              NM_SETTING_WIRELESS_BAND, "bg",
+	              NM_SETTING_WIRELESS_PMF, (guint) NM_SETTING_WIRELESS_PMF_REQUIRED,
 	              NULL);
 
 	g_bytes_unref (ssid);

@@ -3519,6 +3519,7 @@ make_wireless_setting (shvarFile *ifcfg,
 	gint64 chan = 0;
 	NMSettingMacRandomization mac_randomization;
 	NMSettingWirelessPowersave powersave = NM_SETTING_WIRELESS_POWERSAVE_DEFAULT;
+	guint pmf = NM_SETTING_WIRELESS_PMF_DEFAULT;
 
 	s_wireless = NM_SETTING_WIRELESS (nm_setting_wireless_new ());
 
@@ -3699,6 +3700,25 @@ make_wireless_setting (shvarFile *ifcfg,
 	g_object_set (s_wireless,
 	              NM_SETTING_WIRELESS_POWERSAVE,
 	              powersave,
+	              NULL);
+
+	cvalue = svGetValue (ifcfg, "PMF", &value);
+	if (cvalue) {
+		if (!nm_utils_enum_from_str (nm_setting_wireless_pmf_get_type(),
+		                             cvalue,
+		                             (int *) &pmf,
+		                             NULL)) {
+			g_set_error (error, NM_SETTINGS_ERROR, NM_SETTINGS_ERROR_INVALID_CONNECTION,
+			             "Invalid PMF value '%s'", cvalue);
+			g_free (value);
+			goto error;
+		}
+		g_free (value);
+	}
+
+	g_object_set (s_wireless,
+	              NM_SETTING_WIRELESS_PMF,
+	              pmf,
 	              NULL);
 
 	cvalue = svGetValue (ifcfg, "MAC_ADDRESS_RANDOMIZATION", &value);
