@@ -2348,6 +2348,9 @@ build_supplicant_config (NMDeviceWifi *self,
 	NMSupplicantConfig *config = NULL;
 	NMSettingWireless *s_wireless;
 	NMSettingWirelessSecurity *s_wireless_sec;
+	NMSettingWirelessPmf pmf;
+	NMSupplicantFeature pmf_supported;
+	gs_free char *value = NULL;
 
 	g_return_val_if_fail (priv->sup_iface, NULL);
 
@@ -2362,9 +2365,39 @@ build_supplicant_config (NMDeviceWifi *self,
 		_LOGW (LOGD_WIFI, "Supplicant may not support AP mode; connection may time out.");
 	}
 
+	/* Configure PMF (802.11w) */
+	pmf = nm_setting_wireless_get_pmf (s_wireless);
+	if (pmf == NM_SETTING_WIRELESS_PMF_DEFAULT) {
+		value = nm_config_data_get_connection_default (NM_CONFIG_GET_DATA,
+		                                               "wifi.pmf",
+		                                               NM_DEVICE (self));
+		pmf = _nm_utils_ascii_str_to_int64 (value, 10,
+		                                    NM_SETTING_WIRELESS_PMF_DISABLE,
+		                                    NM_SETTING_WIRELESS_PMF_REQUIRED,
+		                                    NM_SETTING_WIRELESS_PMF_OPTIONAL);
+	}
+
+	/* Check if we actually support PMF */
+	pmf_supported = nm_supplicant_interface_get_pmf_support (priv->sup_iface);
+	if (pmf == NM_SETTING_WIRELESS_PMF_REQUIRED) {
+		if (pmf_supported != NM_SUPPLICANT_FEATURE_YES) {
+			g_set_error_literal (error, NM_SUPPLICANT_ERROR, NM_SUPPLICANT_ERROR_CONFIG,
+			                     "Supplicant does not support PMF");
+			goto error;
+		}
+	}
+	if (   pmf == NM_SETTING_WIRELESS_PMF_OPTIONAL
+	    && pmf_supported != NM_SUPPLICANT_FEATURE_YES) {
+		/* To be on the safe side, assume no support if we can't determine
+		 * capabilities.
+		 */
+		pmf = NM_SETTING_WIRELESS_PMF_DISABLE;
+	}
+
 	if (!nm_supplicant_config_add_setting_wireless (config,
 	                                                s_wireless,
 	                                                fixed_freq,
+	                                                pmf,
 	                                                error)) {
 		g_prefix_error (error, "802-11-wireless: ");
 		goto error;
@@ -2384,6 +2417,7 @@ build_supplicant_config (NMDeviceWifi *self,
 		                                                         s_8021x,
 		                                                         con_uuid,
 		                                                         mtu,
+		                                                         pmf,
 		                                                         error)) {
 			g_prefix_error (error, "802-11-wireless-security: ");
 			goto error;

@@ -53,6 +53,7 @@ GHashTable *nm_supplicant_config_get_blobs (NMSupplicantConfig *self);
 gboolean nm_supplicant_config_add_setting_wireless (NMSupplicantConfig *self,
                                                     NMSettingWireless *setting,
                                                     guint32 fixed_freq,
+                                                    NMSettingWirelessPmf pmf,
                                                     GError **error);
 
 gboolean nm_supplicant_config_add_setting_wireless_security (NMSupplicantConfig *self,
@@ -60,6 +61,7 @@ gboolean nm_supplicant_config_add_setting_wireless_security (NMSupplicantConfig 
                                                              NMSetting8021x *setting_8021x,
                                                              const char *con_uuid,
                                                              guint32 mtu,
+                                                             NMSettingWirelessPmf pmf,
                                                              GError **error);
 
 gboolean nm_supplicant_config_add_no_security (NMSupplicantConfig *self,
