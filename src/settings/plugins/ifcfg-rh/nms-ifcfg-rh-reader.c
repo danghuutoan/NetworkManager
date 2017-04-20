@@ -3704,15 +3704,18 @@ make_wireless_setting (shvarFile *ifcfg,
 
 	cvalue = svGetValue (ifcfg, "PMF", &value);
 	if (cvalue) {
+		int i_pmf;
+
 		if (!nm_utils_enum_from_str (nm_setting_wireless_pmf_get_type(),
 		                             cvalue,
-		                             (int *) &pmf,
+		                             &i_pmf,
 		                             NULL)) {
 			g_set_error (error, NM_SETTINGS_ERROR, NM_SETTINGS_ERROR_INVALID_CONNECTION,
 			             "Invalid PMF value '%s'", cvalue);
 			g_free (value);
 			goto error;
 		}
+		pmf = i_pmf;
 		g_free (value);
 	}
 
